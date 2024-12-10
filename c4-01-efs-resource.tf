@@ -33,16 +33,24 @@ resource "aws_efs_file_system" "efs_file_system" {
   }
 }
 
+# Fetch the AZ of each subnet
+data "aws_subnet" "subnets" {
+  for_each = toset(var.eks_private_subnets)
+  id       = each.value
+}
 
+# Extract the AZ for each subnet
+locals {
+  subnet_azs = { for s in data.aws_subnet.subnets : s.id => s.availability_zone }
+}
 
-# Resource: EFS Mount Target
+# Create EFS Mount Targets in different AZs only
 resource "aws_efs_mount_target" "efs_mount_target" {
-  #for_each = toset(module.vpc.private_subnets)
-  # count = 2
-  file_system_id = aws_efs_file_system.efs_file_system.id
-  count = length(var.eks_private_subnets)
-  subnet_id      = var.eks_private_subnets[count.index]
-  security_groups = [ aws_security_group.efs_allow_access.id ]
+  count = length(distinct(local.subnet_azs))  # Only count unique AZs
+
+  file_system_id  = aws_efs_file_system.efs_file_system.id
+  subnet_id       = element(var.eks_private_subnets, count.index)
+  security_groups = [aws_security_group.efs_allow_access.id]
 }
 
 
