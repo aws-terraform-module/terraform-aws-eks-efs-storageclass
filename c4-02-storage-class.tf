@@ -11,5 +11,7 @@ resource "kubernetes_storage_class_v1" "efs_sc" {
     gidRangeStart = "1000" # optional
     gidRangeEnd = "2000" # optional
     basePath = "/dynamic_provisioning" # optional
+    gid = var.gid
+    uid = var.uid
   }
 }

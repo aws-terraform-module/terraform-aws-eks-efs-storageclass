@@ -53,3 +53,15 @@ variable "eks_private_subnets" {
   type = list(string)
   default = ["69.69.69.0/24", "06.05.1994.0/24"]
 }
+
+
+variable "gid" {
+  description = "The default group ID for the provisioned directories. This determines the group ownership of the EFS volume."
+  type = number
+  default = 1000
+}
+variable "uid" {
+  description = "The default user ID for the provisioned directories. This determines the user ownership of the EFS volume."
+  type = number
+  default = 1000
+}
