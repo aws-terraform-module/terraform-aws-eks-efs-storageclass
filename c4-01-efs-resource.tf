@@ -62,9 +62,6 @@ resource "aws_efs_mount_target" "efs_mount_target" {
   file_system_id  = aws_efs_file_system.efs_file_system.id
   subnet_id       = local.unique_az_subnets[count.index] # Select subnet for the mount target
   security_groups = [aws_security_group.efs_allow_access.id]
-
-  # Ensure that the mount target is created in the unique AZ
-  availability_zone_id = local.subnet_az_ids[local.unique_az_subnets[count.index]]
 }
 
 
