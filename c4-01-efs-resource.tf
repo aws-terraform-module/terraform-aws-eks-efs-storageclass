@@ -43,11 +43,14 @@ data "aws_subnet" "subnets" {
 # Extract the AZ ID for each subnet
 locals {
   subnet_az_ids = { for s in data.aws_subnet.subnets : s.id => s.availability_zone_id }
+
+  # Get unique AZ IDs
+  unique_az_ids = distinct(values(local.subnet_az_ids))
 }
 
 # Create EFS Mount Targets in different AZs only
 resource "aws_efs_mount_target" "efs_mount_target" {
-  count = length(distinct(values(local.subnet_az_ids)))  # Extract unique AZ IDs
+  count = length(local.unique_az_ids)  # One mount target per unique AZ ID
 
   file_system_id  = aws_efs_file_system.efs_file_system.id
   subnet_id       = element(var.eks_private_subnets, count.index)
@@ -82,9 +85,4 @@ output "efs_mount_target_dns_name" {
 output "efs_mount_target_availability_zone_name" {
   description = "EFS File System Mount Target availability_zone_name"
   value = aws_efs_mount_target.efs_mount_target[*].availability_zone_name 
-}
-
-
-output "subnet_az_ids" {
-  value = local.subnet_az_ids
 }
