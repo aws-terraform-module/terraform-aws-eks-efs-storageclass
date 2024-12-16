@@ -41,14 +41,14 @@ data "aws_subnet" "subnets" {
   id       = each.value
 }
 
-# Extract the AZ for each subnet
+# Extract the AZ ID for each subnet
 locals {
-  subnet_azs = { for s in data.aws_subnet.subnets : s.id => s.availability_zone }
+  subnet_az_ids = { for s in data.aws_subnet.subnets : s.id => s.availability_zone_id }
 }
 
 # Create EFS Mount Targets in different AZs only
 resource "aws_efs_mount_target" "efs_mount_target" {
-  count = length(distinct(values(local.subnet_azs)))  # Extract unique AZs
+  count = length(distinct(values(local.subnet_az_ids)))  # Extract unique AZ IDs
 
   file_system_id  = aws_efs_file_system.efs_file_system.id
   subnet_id       = element(var.eks_private_subnets, count.index)
