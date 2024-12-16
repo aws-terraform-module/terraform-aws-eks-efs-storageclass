@@ -35,23 +35,32 @@ resource "aws_efs_file_system" "efs_file_system" {
   }
 }
 
-# Fetch the AZ of each subnet
 data "aws_subnet" "subnets" {
   for_each = toset(var.eks_private_subnets)
   id       = each.value
 }
 
-# Extract the AZ for each subnet
+# Extract the AZ ID for each subnet and group by AZ ID
 locals {
-  subnet_azs = { for s in data.aws_subnet.subnets : s.id => s.availability_zone }
+  # Map subnet ids to their AZ ids
+  subnet_az_ids = { for s in data.aws_subnet.subnets : s.id => s.availability_zone_id }
+
+  # Group subnets by AZ, creating a map of AZ IDs to lists of subnets in that AZ
+  subnets_by_az = {
+    for az in distinct(values(local.subnet_az_ids)) : az => [
+      for s_id, az_id in local.subnet_az_ids : s_id if az_id == az
+    ]
+  }
+
+  # Ensure only one subnet is selected from each AZ for the mount target
+  unique_az_subnets = flatten([for az, subnets in local.subnets_by_az : [subnets[0]]]) # pick the first subnet from each AZ
 }
 
-# Create EFS Mount Targets in different AZs only
 resource "aws_efs_mount_target" "efs_mount_target" {
-  count = length(distinct(local.subnet_azs))  # Only count unique AZs
+  count = length(local.unique_az_subnets)  # One mount target per unique AZ
 
   file_system_id  = aws_efs_file_system.efs_file_system.id
-  subnet_id       = element(var.eks_private_subnets, count.index)
+  subnet_id       = local.unique_az_subnets[count.index] # Select subnet for the mount target
   security_groups = [aws_security_group.efs_allow_access.id]
 }
 
