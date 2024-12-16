@@ -28,6 +28,8 @@ resource "aws_security_group" "efs_allow_access" {
 # Resource: EFS File System
 resource "aws_efs_file_system" "efs_file_system" {
   creation_token = "efs-${var.efs_name}"
+
+  throughput_mode = var.throughput_mode
   tags = {
     Name = "efs-${var.efs_name}"
   }

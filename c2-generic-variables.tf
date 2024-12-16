@@ -65,3 +65,10 @@ variable "uid" {
   type = number
   default = 1000
 }
+
+
+variable "throughput_mode" {
+  description = "(Optional) Throughput mode for the file system. Defaults to elastic. Valid values: `bursting`, or `elastic`."
+  type = string
+  default = "elastic"
+}
