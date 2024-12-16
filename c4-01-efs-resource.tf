@@ -35,7 +35,6 @@ resource "aws_efs_file_system" "efs_file_system" {
   }
 }
 
-# Fetch the AZ of each subnet
 data "aws_subnet" "subnets" {
   for_each = toset(var.eks_private_subnets)
   id       = each.value
