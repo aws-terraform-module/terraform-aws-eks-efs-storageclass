@@ -48,7 +48,7 @@ locals {
 
 # Create EFS Mount Targets in different AZs only
 resource "aws_efs_mount_target" "efs_mount_target" {
-  count = length(distinct(local.subnet_azs))  # Only count unique AZs
+  count = length(distinct(values(local.subnet_azs)))  # Extract unique AZs
 
   file_system_id  = aws_efs_file_system.efs_file_system.id
   subnet_id       = element(var.eks_private_subnets, count.index)
