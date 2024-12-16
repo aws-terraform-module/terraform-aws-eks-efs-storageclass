@@ -83,3 +83,8 @@ output "efs_mount_target_availability_zone_name" {
   description = "EFS File System Mount Target availability_zone_name"
   value = aws_efs_mount_target.efs_mount_target[*].availability_zone_name 
 }
+
+
+output "subnet_az_ids" {
+  value = local.subnet_az_ids
+}
