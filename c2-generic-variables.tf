@@ -71,4 +71,8 @@ variable "throughput_mode" {
   description = "(Optional) Throughput mode for the file system. Defaults to elastic. Valid values: `bursting`, or `elastic`."
   type = string
   default = "elastic"
+  validation {
+    condition     = contains(["bursting", "elastic"], var.throughput_mode)
+    error_message = "Allowed values for throughput_mode are 'bursting' or 'elastic'."
+  }
 }
