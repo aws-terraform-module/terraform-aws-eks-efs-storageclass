@@ -3,17 +3,13 @@ terraform {
   required_version = ">= 1.0.0"
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
       version = "~> 5.0"
-     }
+    }
     kubernetes = {
       source  = "hashicorp/kubernetes"
       version = "~> 2.11"
     }
-    http = {
-      source  = "hashicorp/http"
-      version = "~> 3.0"
-    } 
   }
   # Adding Backend as S3 for Remote State Storage
   # backend "s3" {
@@ -25,4 +21,3 @@ terraform {
   #   dynamodb_table = "dev-efs-sampleapp-demo"    
   # }    
 }
-
